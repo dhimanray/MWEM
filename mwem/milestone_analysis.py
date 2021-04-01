@@ -5,7 +5,7 @@ import mwem
 
 
 def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_milestone,end_milestone,
-        radial=False,cell_prob_file='cell_prob.dat',numMCMC=50000,intervalMCMC=10):
+        radial=False,cell_prob_file='cell_prob.dat',reverse=False,numMCMC=50000,intervalMCMC=10):
     '''
     Inputs
     ---------------------------------------------------------------------
@@ -40,6 +40,9 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     cell_prob_file: Filename where the output of equilibrium probability 
                     per cell will be printed (default: 'cell_prob.dat')
+
+    reverse:        If True calculates the MFPT of the backward (reverse) direction
+                    default: False
 
     numMCMC:        Number of MCMC steps are to be performed for error estimation
 
@@ -133,6 +136,7 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     N_i_j = np.zeros((N,N))
     R_i = np.zeros(N)
+    Nhit = np.zeros((N,N))
 
     #loop over cell
     for i in range(N-1):
@@ -157,13 +161,22 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
                 #compute Nij and Ri for individual trajectories
                 N_ij_traj, R_i_traj = mwem.compute_Nij_Ri(trajectory_crossings,p,i,N)
 
+                #compute Nhit for individual trajectories
+                Nhit_traj = mwem.compute_Nhit(trajectory_crossings,i,N)
+
                 #perform weighted sum
                 if weights[j] > cutoff:
                     N_i_j += weights[j]*N_ij_traj
                     R_i   += weights[j]*R_i_traj
 
+                #sum the Nhits
+                Nhit += Nhit_traj
+
     #compute Q matrix
-    Q = mwem.Q_matrix(N_i_j,R_i,N)
+    if reverse == True:
+        Q = mwem.Q_matrix_rev(N_i_j,R_i,N)
+    else :
+        Q = mwem.Q_matrix(N_i_j,R_i,N)
 
     #compute MFPTs
     start = start_milestone
@@ -172,7 +185,7 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
     #estimate error using MCMC
     N_total = numMCMC
     interval = intervalMCMC
-    Q_array = mwem.Monte_Carlo_bootstrapping(N_total,Q,R_i,N_i_j,interval)
+    Q_array = mwem.Monte_Carlo_bootstrapping(N_total,Q,R_i,Nhit,interval)
 
     MFPT_list = []
     for Q_sampled in Q_array:
@@ -201,4 +214,5 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
 #f_mfpt.close()
 #f3.close()
+
 

@@ -118,6 +118,21 @@ def compute_Nij_Ri(trajectory_crossings,p,i,N):
     
     return N_i_j, R_i
 
+#Construct the matrix of number of hitting points for one trajectory trace
+def compute_Nhit(trajectory_crossings,i,N):
+    Nhit = np.zeros((N,N))
+
+    l = trajectory_crossings
+
+    for j in range(1,len(l)):
+        #hitting a milestone coming from a different milestone
+        if l[j-1,1] == 0 and l[j,1] == 1 :
+            Nhit[i,i+1] += 1.0 
+        elif l[j-1,1] == 1 and l[j,1] == 0 :
+            Nhit[i+1,i] += 1.0 
+
+    return Nhit
+
 def Q_matrix(N_i_j,R_i,N):
     '''
     Construct the Q matrix for kinetics calculation
@@ -134,6 +149,31 @@ def Q_matrix(N_i_j,R_i,N):
         Q[i,i] = -np.sum(Q[i])
 
     return Q    
+
+def Q_matrix_rev(N_i_j,R_i,N):
+    '''
+    Construct the reverse Q matrix for kinetics calculation
+    of the backward transition
+
+    Replacing i with N-1-i so that indices change linke this
+    0 -> N-1
+    1 -> N-2
+    ...
+    N-1 -> 0
+    '''
+
+    Q = np.zeros((N,N))
+
+    for i in range(N):
+        for j in range(N):
+            if R_i[N-1-i] != 0:
+                Q[i,j] = N_i_j[N-1-i,N-1-j]/R_i[N-1-i]
+
+    for i in range(N):
+        Q[i,i] = -np.sum(Q[i])
+
+    return Q
+
 
 #-------------------------------------------------------------------------------
 #Construct the truncated rate matrix and compute MFPT
