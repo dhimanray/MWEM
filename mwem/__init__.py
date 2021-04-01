@@ -5,6 +5,9 @@ Markovian Weighted Ensemble Milestoning (MWEM)
 
 # Add imports here
 from .functions import *
+from .milestone_analysis_functions import *
+from .westpa_analysis_functions import *
+from .milestone_analysis import *
 
 # Handle versioneer
 from ._version import get_versions
