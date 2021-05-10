@@ -4,6 +4,6 @@
 export WEST_PYTHON=$(which python)
 # Actviate a conda environment containing westpa, openmm, mdtraj;
 # You may need to create this first (see install instructions)
-source activate westpa-openmm
+source activate westpa
 export WEST_SIM_ROOT="$PWD"
 export SIM_NAME=$(basename $WEST_SIM_ROOT)
