@@ -1,0 +1,17 @@
+colvarsTrajFrequency    TRAJ_FREQ 
+
+
+#Na-Cl distnace
+colvar {
+  name r
+
+  distance {
+    group1 {
+      atomNumbers 1 # Na+
+    }
+    group2 {
+      atomNumbers 2 # Cl-
+    }
+  }
+}
+

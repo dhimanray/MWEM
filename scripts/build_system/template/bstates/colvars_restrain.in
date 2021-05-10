@@ -1,0 +1,28 @@
+colvarsTrajFrequency      TRAJ_FREQ
+
+
+#Na-Cl distnace
+colvar {
+  name r
+
+  distance {
+    group1 {
+      atomNumbers 1 # Na+
+    }
+    group2 {
+      atomNumbers 2 # Cl-
+    }
+  }
+}
+
+#Apply harmonic restraint
+
+#gradually increase force constant over the trajectory
+#to constrain the dynamics on milestone (The user can choose a constant 
+#harmonic potential throughout equilibration)
+
+harmonic {
+  colvars r
+  centers X_0
+  forceConstant K_RES
+}

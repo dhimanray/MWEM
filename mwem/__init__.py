@@ -8,6 +8,7 @@ from .functions import *
 from .milestone_analysis_functions import *
 from .westpa_analysis_functions import *
 from .milestone_analysis import *
+from .committor import *
 
 # Handle versioneer
 from ._version import get_versions

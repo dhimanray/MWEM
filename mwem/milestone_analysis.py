@@ -5,7 +5,7 @@ import mwem
 
 
 def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_milestone,end_milestone,
-        radial=False,cell_prob_file='cell_prob.dat',reverse=False,numMCMC=50000,intervalMCMC=10):
+        radial=False,cell_prob_file='cell_prob.dat',reverse=False,returnNR=False,numMCMC=50000,intervalMCMC=10):
     '''
     Inputs
     ---------------------------------------------------------------------
@@ -43,6 +43,8 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     reverse:        If True calculates the MFPT of the backward (reverse) direction
                     default: False
+
+    returnNR:       IF True, returns the N_ij and R_i matrices
 
     numMCMC:        Number of MCMC steps are to be performed for error estimation
 
@@ -180,7 +182,12 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     #compute MFPTs
     start = start_milestone
-    end = end_milestone 
+    end = end_milestone
+
+    #print(N_i_j)
+
+    #compute probabiliy K_i,i-1 for k_on calculation
+    K_i_i_minus_1 = N_i_j[end_milestone-1,end_milestone-2]/np.sum(N_i_j[end_milestone-1])
 
     #estimate error using MCMC
     N_total = numMCMC
@@ -198,7 +205,7 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
     conf = st.t.interval(alpha=0.95, df=len(MFPT_list)-1, loc=np.mean(MFPT_list), scale=st.sem(MFPT_list))
     
    
-    mfpt = mwem.MFPT(Q,start,end)[start]*dt
+    mfpt = mwem.MFPT(Q,0,end)[start]*dt
 
     mean_mfpt = np.mean(MFPT_list)
 
@@ -206,7 +213,10 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     upper_conf = conf[1]
 
-    return mfpt, mean_mfpt, lower_conf, upper_conf
+    if returnNR == True:
+        return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1, N_i_j, R_i
+    else:
+        return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1
     #return mile.MFPT(Q,start,end)[start]*dt, np.mean(MFPT_list), conf[0], conf[1]
     #print(num_iter,np.mean(MFPT_list),conf[0],conf[1],file=f_mfpt)
 
