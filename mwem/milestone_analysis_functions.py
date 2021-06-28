@@ -226,18 +226,21 @@ def Monte_Carlo_bootstrapping(N_total,K,t,Nhit,interval):
         r1 = np.random.randint(0,N-1)
         if r1 == 0:
             Q_ab = Q[r1,r1+1]
+            N_ab = Nhit[r1,r1-1]
         else :
             r2 = np.random.randint(0,1)
             if r2 == 0:
                 Q_ab = Q[r1,r1-1]
+                N_ab = Nhit[r1,r1-1]
             else :
                 Q_ab = Q[r1,r1+1]
+                N_ab = Nhit[r1,r1+1]
 
 
         delta = np.random.exponential(scale=Q_ab) - Q_ab
 
 
-        log_pacc = Nhit[r1,r1+1]*np.log((Q_ab + delta)/Q_ab) - delta * t[r1]*np.sum(Nhit[r1])
+        log_pacc = N_ab*np.log((Q_ab + delta)/Q_ab) - delta * t[r1]*np.sum(Nhit[r1])
 
         r = np.random.uniform(low=0.0,high=1.0)
 

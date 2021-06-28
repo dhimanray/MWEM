@@ -23,7 +23,7 @@ for num_iter in num_iter_list:
         weights_file = 'weights_%d.txt'%num_iter
 
     MFPT, mean_MFPT, lower_conf, upper_conf, k_rev = mwem.milestoning(crossings_file=crossings_file, weights_file=weights_file, indices=indices, milestones=milestones,
-        cutoff=1E-8, dt=10*1E-3, start_milestone = 1, end_milestone = len(milestones)-2, radial=False, cell_prob_file='cell_probability/cell_prob_%d.dat'%num_iter, numMCMC = 50000,
+        cutoff=1E-8, dt=10*1E-3, start_milestone = 1, end_milestone = len(milestones)-2, radial=False, cell_prob_file='cell_probability/cell_prob_%d.dat'%num_iter, numMCMC = 200000,
         intervalMCMC = 50)
 
     print(num_iter,mean_MFPT, lower_conf, upper_conf, file=f_mfpt)

@@ -188,6 +188,7 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     #compute probabiliy K_i,i-1 for k_on calculation
     K_i_i_minus_1 = N_i_j[end_milestone-1,end_milestone-2]/np.sum(N_i_j[end_milestone-1])
+    #K_rev_list = []
 
     #estimate error using MCMC
     N_total = numMCMC
@@ -201,6 +202,10 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
         MFPT_list.append(dt*MFPTs[start])
 
+        #K_i_i_minus_1 = Q_sampled[end_milestone-1,end_milestone-2]/np.sum(Q_sampled[end_milestone-1])
+
+        #K_rev_list.append(K_i_i_minus_1)
+
     MFPT_list = np.array(MFPT_list)
     conf = st.t.interval(alpha=0.95, df=len(MFPT_list)-1, loc=np.mean(MFPT_list), scale=st.sem(MFPT_list))
     
@@ -212,6 +217,14 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
     lower_conf = conf[0]
 
     upper_conf = conf[1]
+
+    #mean_k_rev = np.mean(K_rev_list)
+
+    #conf_k_rev = st.t.interval(alpha=0.95, df=len(K_rev_list)-1, loc=np.mean(K_rev_list), scale=st.sem(K_rev_list))
+
+    #lower_conf_k_rev = conf_k_rev[0]
+
+    #upper_conf_k_rev = conf_k_rev[1]
 
     if returnNR == True:
         return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1, N_i_j, R_i

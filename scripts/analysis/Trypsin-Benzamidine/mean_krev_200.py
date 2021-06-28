@@ -13,8 +13,8 @@ r = 12 #radius of the outermost milestone in Angstrom
 
 a = 7.569 * 1E+8 * r * alpha * a
 
-mean_krev = np.mean(a[-5:])
-std_krev = np.std(a[-5:])
+mean_krev = np.mean(a[-10:-5])
+std_krev = np.std(a[-10:-5])
 
 conf_int = 2.571*std_krev/np.sqrt(5.0)
 
