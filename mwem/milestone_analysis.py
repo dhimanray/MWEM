@@ -5,7 +5,7 @@ import mwem
 
 
 def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_milestone,end_milestone,
-        radial=False,cell_prob_file='cell_prob.dat',reverse=False,returnNR=False,numMCMC=50000,intervalMCMC=10):
+        radial=False,cell_prob_file='cell_prob.dat',reverse=False,returnNR=False,doMCMC=False,numMCMC=50000,intervalMCMC=10):
     '''
     Inputs
     ---------------------------------------------------------------------
@@ -46,9 +46,13 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     returnNR:       IF True, returns the N_ij and R_i matrices
 
+    doMCMC:         If True, Monte Carlo error analysis is performed
+
     numMCMC:        Number of MCMC steps are to be performed for error estimation
+                    Ignored if doMCMC=False.
 
     intervalMCMC:   Frequency at which MCMC matrices are sampled
+                    Ignored if doMCMC=False.
 
     ------------------------------------------------------------------------------
 
@@ -58,10 +62,13 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
     mfpt:           Mean first passage time from start milestone to end milestone
 
     mean_mfpt:      Avg MFPT computed from MCMC bootstrapping error analysis
+                    Not returned if doMCMC=False
 
     lower_conf:     Lower confidence interval
+                    Not returned if doMCMC=False
 
     upper_conf:     Upper confidence interval
+                    Not returned if doMCMC=False
 
     -------------------------------------------------------------------------------
 
@@ -186,56 +193,45 @@ def milestoning(crossings_file,weights_file,indices,milestones,cutoff,dt,start_m
 
     #print(N_i_j)
 
+    mfpt = mwem.MFPT(Q,0,end)[start]*dt
+
     #compute probabiliy K_i,i-1 for k_on calculation
     K_i_i_minus_1 = N_i_j[end_milestone-1,end_milestone-2]/np.sum(N_i_j[end_milestone-1])
     #K_rev_list = []
 
-    #estimate error using MCMC
-    N_total = numMCMC
-    interval = intervalMCMC
-    Q_array = mwem.Monte_Carlo_bootstrapping(N_total,Q,R_i,Nhit,interval)
+    #estimate error using MCMC if doMCMC is True
+    if doMCMC == True:
+        N_total = numMCMC
+        interval = intervalMCMC
+        Q_array = mwem.Monte_Carlo_bootstrapping(N_total,Q,R_i,Nhit,interval)
 
-    MFPT_list = []
-    for Q_sampled in Q_array:
+        MFPT_list = []
+        for Q_sampled in Q_array:
 
-        MFPTs = mwem.MFPT(Q_sampled,0,end) #MFPT computation has to start at 0 irrespective of initial milestone
+            MFPTs = mwem.MFPT(Q_sampled,0,end) #MFPT computation has to start at 0 irrespective of initial milestone
 
-        MFPT_list.append(dt*MFPTs[start])
+            MFPT_list.append(dt*MFPTs[start])
 
-        #K_i_i_minus_1 = Q_sampled[end_milestone-1,end_milestone-2]/np.sum(Q_sampled[end_milestone-1])
-
-        #K_rev_list.append(K_i_i_minus_1)
-
-    MFPT_list = np.array(MFPT_list)
-    conf = st.t.interval(alpha=0.95, df=len(MFPT_list)-1, loc=np.mean(MFPT_list), scale=st.sem(MFPT_list))
+        MFPT_list = np.array(MFPT_list)
+        conf = st.t.interval(alpha=0.95, df=len(MFPT_list)-1, loc=np.mean(MFPT_list), scale=st.sem(MFPT_list))
     
-   
-    mfpt = mwem.MFPT(Q,0,end)[start]*dt
+        mean_mfpt = np.mean(MFPT_list)
 
-    mean_mfpt = np.mean(MFPT_list)
+        lower_conf = conf[0]
 
-    lower_conf = conf[0]
+        upper_conf = conf[1]
+    
+    if doMCMC == True:
+        if returnNR == True:
+            return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1, N_i_j, R_i
+        else:
+            return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1
+    else :
+        if returnNR == True:
+            return mfpt, K_i_i_minus_1, N_i_j, R_i
+        else:
+            return mfpt, K_i_i_minus_1
 
-    upper_conf = conf[1]
-
-    #mean_k_rev = np.mean(K_rev_list)
-
-    #conf_k_rev = st.t.interval(alpha=0.95, df=len(K_rev_list)-1, loc=np.mean(K_rev_list), scale=st.sem(K_rev_list))
-
-    #lower_conf_k_rev = conf_k_rev[0]
-
-    #upper_conf_k_rev = conf_k_rev[1]
-
-    if returnNR == True:
-        return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1, N_i_j, R_i
-    else:
-        return mfpt, mean_mfpt, lower_conf, upper_conf, K_i_i_minus_1
-    #return mile.MFPT(Q,start,end)[start]*dt, np.mean(MFPT_list), conf[0], conf[1]
-    #print(num_iter,np.mean(MFPT_list),conf[0],conf[1],file=f_mfpt)
-
-    #print(num_iter,mile.MFPT(Q,start,end)[start]*dt,file=f3)
-
-#f_mfpt.close()
-#f3.close()
+    
 
 
