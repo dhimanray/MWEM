@@ -25,13 +25,13 @@ def pruning(traj,low,high,index):
 
     return np.array(prunned)
 
-def remove_extra(traj,tau,ndim=2):
+def remove_extra(traj,tau,num_iterations,ndim=2):
     '''
     traj : trajectory traced
     '''
     traj = traj.T
 
-    traj2 = np.zeros((ndim,(tau-1)*w.niters))
+    traj2 = np.zeros((ndim,(tau-1)*num_iterations))
     for i in range(ndim):
         traj2[i] = np.delete(traj[i], np.arange(0, traj[i].size, tau))
     traj2 = traj2.T

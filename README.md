@@ -5,7 +5,11 @@ MWEM
 [![codecov](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/MWEM/branch/master/graph/badge.svg)](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/MWEM/branch/master)
 
 
-Markovian Weighted Ensemble Milestoning (MWEM)
+Markovian Weighted Ensemble Milestoning (M-WEM)
+
+Relevant manuscript:  "Markovian Weighted Ensemble Milestoning (M-WEM): Long-time Kinetics from Short Trajectories"
+Dhiman Ray, Sharon E. Stone, Ioan Andricioaei, 
+BioRxiv, doi: https://doi.org/10.1101/2021.06.26.450057 
 
 ### Copyright
 
