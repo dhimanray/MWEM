@@ -1,3 +1,7 @@
+# This script combines multiple dcd files from different segments with the directory.
+# Author: Trevor Gokey (Andricioaei group, University of California Irvine, USA) (2020)
+
+
 function removewat {
 	local inp=$(mktemp)
 	local d=$(dirname $3)
